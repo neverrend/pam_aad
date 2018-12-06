@@ -1,0 +1,274 @@
+{
+	"info": {
+		"_postman_id": "60b86a7d-3e53-4160-8842-1327d3dd508f",
+		"name": "Azure Active Directory PAM Module",
+		"description": "> Azure AD supports the device code grant, which allows users to sign in to input-constrained devices such as a smart TV, IoT device, or printer. --[Azure Active Directory v2.0 and the OAuth 2.0 device code flow](https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-device-code)\n\n> Microsoft Graph exposes REST APIs and client libraries to...Azure Active Directory --[Overview of Microsoft Graph](https://docs.microsoft.com/en-us/graph/overview)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "poll_microsoft_for_token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "fc7624eb-e57f-4859-a212-a64ecd03f3e6",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					},
+					{
+						"key": "User-Agent",
+						"value": "{{user_agent}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "resource",
+							"value": "{{resource_id}}",
+							"type": "text"
+						},
+						{
+							"key": "code",
+							"value": "",
+							"type": "text"
+						},
+						{
+							"key": "client_id",
+							"value": "{{client_id}}",
+							"type": "text"
+						},
+						{
+							"key": "grant_type",
+							"value": "device_code",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://{{host}}/common/oauth2/token/",
+					"protocol": "https",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"common",
+						"oauth2",
+						"token",
+						""
+					]
+				},
+				"description": "`src/rest.c#28`"
+			},
+			"response": []
+		},
+		{
+			"name": "read_code_from_microsoft",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "User-Agent",
+						"value": "{{user_agent}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "resource={{resource_id}}&client_id={{client_id}}&&client_request_id={{client_request_id}}&scope=profile"
+				},
+				"url": {
+					"raw": "https://{{tenant}}/oauth2/devicecode/",
+					"protocol": "https",
+					"host": [
+						"{{tenant}}"
+					],
+					"path": [
+						"oauth2",
+						"devicecode",
+						""
+					]
+				},
+				"description": "`src/rest.c#L213`"
+			},
+			"response": []
+		},
+		{
+			"name": "get_microsoft_graph_groups",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Host",
+						"value": "graph.windows.net",
+						"type": "text"
+					},
+					{
+						"key": "User-Agent",
+						"value": "{{user_agent}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"groupId\":{{group_object_id}},\n\t\"memberId\":{{user_object_id}}\n}"
+				},
+				"url": {
+					"raw": "https://{{tenant}}/isMemberOf?api-version=1.6",
+					"protocol": "https",
+					"host": [
+						"{{tenant}}"
+					],
+					"path": [
+						"isMemberOf"
+					],
+					"query": [
+						{
+							"key": "api-version",
+							"value": "1.6"
+						}
+					]
+				},
+				"description": "`src/rest.c#L311`"
+			},
+			"response": []
+		},
+		{
+			"name": "get_microsoft_graph_userprofile",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Host",
+						"type": "text",
+						"value": "graph.windows.net"
+					},
+					{
+						"key": "User-Agent",
+						"type": "text",
+						"value": "{{user_agent}}"
+					},
+					{
+						"key": "",
+						"type": "text",
+						"value": "",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://{{tenant}}/isMemberOf?api-version=1.6",
+					"protocol": "https",
+					"host": [
+						"{{tenant}}"
+					],
+					"path": [
+						"isMemberOf"
+					],
+					"query": [
+						{
+							"key": "api-version",
+							"value": "1.6"
+						}
+					]
+				},
+				"description": "`src/rest.c#L412`"
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "76dc2943-c4d0-4247-ae5c-ac34e25b9889",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "5de157cf-a02d-4558-b8c6-f9a94e29f038",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "83b680e5-fa35-4826-932c-c52155cbb9d2",
+			"key": "host",
+			"value": "login.microsoftonline.com",
+			"type": "string"
+		},
+		{
+			"id": "d2154eca-f65e-4af5-b4e4-53a791a3c36f",
+			"key": "user_agent",
+			"value": "azure_authenticator_pam/1.0",
+			"type": "string"
+		},
+		{
+			"id": "5dc927c0-9ba8-44c9-9f88-8c41f330f2a8",
+			"key": "resource_id",
+			"value": "00000002-0000-0000-c000-000000000000",
+			"type": "string"
+		},
+		{
+			"id": "5f343e2b-dc2a-4a9f-96a0-45d571777a99",
+			"key": "client_request_id",
+			"value": "5929459294929",
+			"type": "string"
+		}
+	]
+}
