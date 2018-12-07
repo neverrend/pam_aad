@@ -14,7 +14,8 @@
           "script": {
             "id": "fc7624eb-e57f-4859-a212-a64ecd03f3e6",
             "exec": [
-              ""
+              "var jsonData = JSON.parse(responseBody);",
+              "postman.setEnvironmentVariable(\"token\", jsonData.access_token);"
             ],
             "type": "text/javascript"
           }
@@ -45,7 +46,7 @@
             },
             {
               "key": "code",
-              "value": "",
+              "value": "{{device_code}}",
               "type": "text"
             },
             {
@@ -79,6 +80,19 @@
     },
     {
       "name": "read_code_from_microsoft",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "3d7546f7-693c-414c-99e2-6ee05e709c11",
+            "exec": [
+              "var jsonData = JSON.parse(responseBody);",
+              "postman.setEnvironmentVariable(\"device_code\", jsonData.device_code);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
       "request": {
         "method": "POST",
         "header": [
@@ -86,19 +100,47 @@
             "key": "User-Agent",
             "value": "{{user_agent}}",
             "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "name": "Content-Type",
+            "value": "application/x-www-form-urlencoded",
+            "type": "text"
           }
         ],
         "body": {
-          "mode": "raw",
-          "raw": "resource={{resource_id}}&client_id={{client_id}}&&client_request_id={{client_request_id}}&scope=profile"
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "resource",
+              "value": "{{resource_id}}",
+              "type": "text"
+            },
+            {
+              "key": "client_id",
+              "value": "{{client_id}}",
+              "type": "text"
+            },
+            {
+              "key": "client_request_id",
+              "value": "{{client_request_id}}",
+              "type": "text"
+            },
+            {
+              "key": "scope",
+              "value": "profile",
+              "type": "text"
+            }
+          ]
         },
         "url": {
-          "raw": "https://{{tenant}}/oauth2/devicecode/",
+          "raw": "https://{{host}}/{{tenant}}/oauth2/devicecode/",
           "protocol": "https",
           "host": [
-            "{{tenant}}"
+            "{{host}}"
           ],
           "path": [
+            "{{tenant}}",
             "oauth2",
             "devicecode",
             ""
@@ -110,9 +152,6 @@
     },
     {
       "name": "get_microsoft_graph_groups",
-      "protocolProfileBehavior": {
-        "disableBodyPruning": true
-      },
       "request": {
         "auth": {
           "type": "bearer",
@@ -124,7 +163,7 @@
             }
           ]
         },
-        "method": "GET",
+        "method": "POST",
         "header": [
           {
             "key": "Host",
@@ -147,12 +186,13 @@
           "raw": "{\n \"groupId\":{{group_object_id}},\n \"memberId\":{{user_object_id}}\n}"
         },
         "url": {
-          "raw": "https://{{tenant}}/isMemberOf?api-version=1.6",
+          "raw": "https://{{host}}/{{tenant}}/isMemberOf?api-version=1.6",
           "protocol": "https",
           "host": [
-            "{{tenant}}"
+            "{{host}}"
           ],
           "path": [
+            "{{tenant}}",
             "isMemberOf"
           ],
           "query": [
@@ -179,7 +219,7 @@
             }
           ]
         },
-        "method": "GET",
+        "method": "POST",
         "header": [
           {
             "key": "Host",
@@ -203,12 +243,13 @@
           "raw": ""
         },
         "url": {
-          "raw": "https://{{tenant}}/isMemberOf?api-version=1.6",
+          "raw": "https://{{host}}/{{tenant}}/isMemberOf?api-version=1.6",
           "protocol": "https",
           "host": [
-            "{{tenant}}"
+            "{{host}}"
           ],
           "path": [
+            "{{tenant}}",
             "isMemberOf"
           ],
           "query": [
@@ -247,25 +288,25 @@
   ],
   "variable": [
     {
-      "id": "83b680e5-fa35-4826-932c-c52155cbb9d2",
+      "id": "355f90d8-9341-49aa-aa23-0af359504472",
       "key": "host",
       "value": "login.microsoftonline.com",
       "type": "string"
     },
     {
-      "id": "d2154eca-f65e-4af5-b4e4-53a791a3c36f",
+      "id": "78248c13-469a-4873-b48e-decaa2d77e31",
       "key": "user_agent",
       "value": "azure_authenticator_pam/1.0",
       "type": "string"
     },
     {
-      "id": "5dc927c0-9ba8-44c9-9f88-8c41f330f2a8",
+      "id": "416d7b9b-f109-4959-baa2-70cefd31b2f5",
       "key": "resource_id",
       "value": "00000002-0000-0000-c000-000000000000",
       "type": "string"
     },
     {
-      "id": "5f343e2b-dc2a-4a9f-96a0-45d571777a99",
+      "id": "79b2d4e6-4fc7-467e-b58e-8f5978efc81e",
       "key": "client_request_id",
       "value": "5929459294929",
       "type": "string"
