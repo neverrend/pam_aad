@@ -10,6 +10,7 @@
 #include "rest.h"
 
 #define PAM_SM_AUTH
+#define PAM_SM_ACCOUNT
 
 #ifndef PAM_EXTERN
 #define PAM_EXTERN
@@ -87,8 +88,7 @@ static const char *get_user_name(pam_handle_t *pamh, const Params *params){
     const char *username;
     if (pam_get_user(pamh, &username, NULL) != PAM_SUCCESS || 
       !username || !*username){
-          log_message(LOG_ERR, pamh,
-          "pam_get_user() failed to get a user name");
+          log_message(LOG_ERR, pamh, "pam_get_user() failed to get a user name");
           return NULL;
       }
      if (params -> debug){
@@ -219,3 +219,4 @@ PAM_EXTERN int pam_sm_acct_mgmt(pam_handle_t *pamh, int flags, int argc,
                                     const char **argv){
   return PAM_SUCCESS;
 }
+

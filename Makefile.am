@@ -7,9 +7,10 @@ MODULES_LDFLAGS = -fPIC -fno-stack-protector -avoid-version -module -shared -exp
 
 libdir = $(PAMDIR)
 
-lib_LTLIBRARIES= pam_aad.la
+lib_LTLIBRARIES= pam_aad.la libnss_aad.la
 
 pam_aad_la_SOURCES = src/pam_aad.c
+libnss_aad_la_SOURCES = src/libnss_aad.c
 
 CORE_SRC = 
 CORE_SRC += src/rest.c src/rest.h
@@ -18,10 +19,14 @@ CORE_SRC += src/utils.c src/utils.h
 CORE_SRC += src/jwt.c src/jwt.h
 
 pam_aad_la_SOURCES  += $(CORE_SRC)
+libnss_aad_la_SOURCES  += src/rest.c src/rest.h src/cJSON.c src/cJSON.h src/utils.c src/utils.h
 
 pam_aad_la_LIBADD = -lpam -lssl -lcrypto -lm -ljwt
+libnss_aad_la_LIBADD = -lssl -lcrypto
 pam_aad_la_CFLAGS = $(AM_CFLAGS)
+libnss_aad_la_CFLAGS = $(AM_CFLAGS)
 pam_aad_la_LDFLAGS = $(AM_LDFLAGS) $(MODULES_LDFLAGS) -export-symbols-regex "^pam_sm_"
+libnss_aad_la_LDFLAGS = $(AM_LDFLAGS) $(MODULES_LDFLAGS) -export-symbols-regex "^get_"
 
 super-clean: maintainer-clean
 	rm -fr aclocal autom4te.cache/ m4 missing libtool config.guess

@@ -59,7 +59,7 @@ int jwt_username_matches(const char* raw_token, char* claimed_username){
 int azure_token_validate(char *raw_token){
     int ret;
     struct jwt token = parse_token(raw_token);
-    ret = verify_token(token, token.token, "");
+    ret = verify_token(token, token.token, NULL);
     return ret;
 }
 
@@ -67,7 +67,7 @@ int verify_token(struct jwt base_jwt, const char *raw_token, const unsigned char
     int ret;
     int key_len;
     jwt_t **jwt;
-    key_len = strlen(key);
-    ret = jwt_decode(jwt, raw_token, key, key_len);
+    key_len = (key == NULL) ? 0 : strlen(key);
+    ret = jwt_decode(&jwt, raw_token, key, key_len);
     return ret;
 }

@@ -274,3 +274,4 @@ libtool
 src/.deps/
 src/.dirstamp
 src/*.lo
+tmp/
