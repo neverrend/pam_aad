@@ -65,7 +65,7 @@ str_replace ( const char *string, const char *substr, const char *replacement ){
   return newstr;
 }
 
-int split (const char *str, char c, char ***arr)
+int split (char *str, char c, char ***arr)
 {
     int count = 1;
     int token_len = 1;
@@ -131,7 +131,6 @@ char* load_file(char const* path)
     char* buffer = 0;
     long length;
     FILE * f = fopen (path, "rb"); //was "rb"
-    int i;
     if (f)
     {
       fseek (f, 0, SEEK_END);

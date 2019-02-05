@@ -11,6 +11,9 @@
 #define HOST "login.microsoftonline.com"
 #define PORT "443"
 
+int fill_json_buffer(char *json_buf, char *raw_response, int *start, int *end);
+int find_json_bounds(char *json_buf, int *start, int *end);
+
 /*
  * Function: poll_microsoft_for_token
  * ----------------------------------
@@ -137,14 +140,13 @@ int request_azure_oauth_token(char *code, char *resource_id, char *client_id, ch
     int start, end;
     char response_buf[9000];
     char json_buf[9000];
-    cJSON *json; 
-    char *access_token;
+    cJSON *json, *access_token; 
     poll_microsoft_for_token(code, resource_id, client_id, response_buf);
     find_json_bounds(response_buf, &start, &end);
     fill_json_buffer(json_buf, response_buf, &start, &end);
     json = cJSON_Parse(json_buf);
-    cJSON *access = cJSON_GetObjectItem(json, "access_token");
-    if (access == NULL){
+    access_token = cJSON_GetObjectItem(json, "access_token");
+    if (access_token == NULL){
         /* Something failed. */
         strcpy(token_buf, "FAILURE");
         return 1;
@@ -185,7 +187,7 @@ int fill_json_buffer(char *json_buf, char *raw_response, int *start, int *end){
 int get_client_id(char *client_id){
     srand(time(NULL));
     int random = rand();
-    sprintf(client_id, "%ld", random);
+    sprintf(client_id, "%d", random);
     return 0;
 }
 /*
@@ -316,12 +318,9 @@ int get_microsoft_graph_groups(char *user_object_id, char *response_buf, char *t
     /* SSL* ssl; */
     SSL_CTX* ctx;
     
-    char post_buf[2048];
-
     /* Variables used to read the response from the server */
     int size;
     char buf[2048];
-    char write_buf[204800];
     
     strcpy(response_buf, "");
     /* Registers the available SSL/TLS ciphers */
@@ -415,8 +414,6 @@ int get_microsoft_graph_userprofile(char *token, char *response_buf, char *tenan
     /* SSL* ssl; */
     SSL_CTX* ctx;
     
-    char post_buf[2048];
-
     /* Variables used to read the response from the server */
     int size;
     char buf[2048];
@@ -498,9 +495,7 @@ int get_microsoft_graph_userprofile(char *token, char *response_buf, char *tenan
 }
 
 int parse_user_groups(char *response_buf, cJSON* group_membership_value){
-    char garbage[1000];
     char json_buf[4000];
-    char doublegarbage[10000];
     int start, end;
     cJSON *json;
     strcat(response_buf, "\0");
@@ -555,7 +550,6 @@ int parse_user_object_id(char *response_buf, char* user_object_id_buf){
 
 int request_azure_signin_code(char *user_code, char *resource_id, char *client_id, char *tenant, char *device_code){
     char response_buf[2048];
-    char code_buf[100];
     char json_buf[2048];
     cJSON *json;
     int start, end;
@@ -574,18 +568,18 @@ int request_azure_signin_code(char *user_code, char *resource_id, char *client_i
 }
 
 int request_azure_group_membership(char *token, char *required_group_id, char *tenant){
-    int success = 2;
+//    int success = 2;
     char user_profile_buf[1000];
     char user_object_id_buf[100];
     char raw_group_buf[10000];
-    cJSON *group_membership_value; 
+//    cJSON *group_membership_value; 
 
      get_microsoft_graph_userprofile(token, user_profile_buf, tenant);
      parse_user_object_id(user_profile_buf, user_object_id_buf);
      get_microsoft_graph_groups(user_object_id_buf, raw_group_buf, token, tenant, required_group_id);
-     int is_in_group = parse_user_groups(raw_group_buf, group_membership_value);
-     if(is_in_group == success){
-         return 0;
-     }
+//     int is_in_group = parse_user_groups(raw_group_buf, group_membership_value);
+//     if(is_in_group == success){
+//         return 0;
+//     }
      return 1;
 }
